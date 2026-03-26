@@ -1,0 +1,12 @@
+# Mac files
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+
+# Database
+instance/users.db
+
+# IDE files
+.idea/

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            background: #f5f7fa;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 220px;
+            background: #1f2937;
+            color: white;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .sidebar h2 {
+            margin-bottom: 30px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 12px;
+            color: #d1d5db;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+
+        .sidebar a:hover {
+            background: #374151;
+            color: white;
+        }
+
+        .active {
+            background: #4f46e5;
+            color: white !important;
+            font-weight: bold;
+        }
+
+        /* MAIN */
+        .main {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        /* CARDS */
+        .cards {
+            display: flex;
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            flex: 1;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        /* FORM */
+        .form-box {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        input {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 10px 15px;
+            background: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+        }
+
+        /* TABLE */
+        table {
+            width: 100%;
+            margin-top: 20px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #f3f4f6;
+        }
+
+        tr:nth-child(even) {
+            background: #f9fafb;
+        }
+
+        .actions a {
+            margin-right: 10px;
+        }
+        /* 📱 RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+
+    /* 1. CHANGE FULL PAGE LAYOUT */
+    body {
+        flex-direction: column;
+    }
+
+    /* 2. SIDEBAR → TOP MENU */
+    .sidebar {
+        width: 100%;
+        height: auto;
+        display: flex;
+        justify-content: space-around;
+        padding: 10px;
+    }
+
+    /* Hide title on mobile */
+    .sidebar h2 {
+        display: none;
+    }
+
+    /* Make links smaller */
+    .sidebar a {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    /* 3. MAIN CONTENT */
+    .main {
+        padding: 10px;
+    }
+
+    /* 4. CARDS STACK VERTICALLY */
+    .cards {
+        flex-direction: column;
+    }
+
+    /* 5. TABLE SCROLLABLE */
+    table {
+        display: block;
+        overflow-x: auto;
+    }
+
+    /* 6. INPUT FULL WIDTH */
+    input {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    /* 7. BUTTON FULL WIDTH */
+    button {
+        width: 100%;
+    }
+}
+    </style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <h2>💰 Expense</h2>
+
+    <a href="/dashboard" class="{% if active_page=='dashboard' %}active{% endif %}">📊 Dashboard</a>
+    <a href="/expenses" class="{% if active_page=='expenses' %}active{% endif %}">📋 Expenses</a>
+    <a href="/reports" class="{% if active_page=='reports' %}active{% endif %}">📑 Reports</a>
+    <a href="/logout">🚪 Logout</a>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+    <!-- HEADER -->
+    <div class="header">
+        <h2>Dashboard</h2>
+        <a href="/export"><button>⬇️ Export CSV</button></a>
+    </div>
+
+    <!-- 💰 BUDGET CARDS -->
+    <div class="cards">
+        <div class="card">
+            <h3>Total Spent</h3>
+            <p>₹ {{ total }}</p>
+        </div>
+
+        <div class="card">
+            <h3>Budget</h3>
+            <p>₹ {{ budget }}</p>
+        </div>
+
+        <div class="card">
+            <h3>Remaining</h3>
+            <p style="color: {% if remaining < 0 %}red{% else %}green{% endif %}">
+                ₹ {{ remaining }}
+            </p>
+        </div>
+    </div>
+
+    <!-- 🚨 WARNING -->
+    {% if remaining < 0 %}
+        <p style="color:red; font-weight:bold; margin-top:10px;">
+            ⚠️ You exceeded your budget!
+        </p>
+    {% endif %}
+
+    <!-- 📊 PROGRESS BAR -->
+    <div style="background:#e5e7eb; border-radius:10px; margin-top:10px;">
+        <div style="
+            width: {{ (total/budget*100) if budget else 0 }}%;
+            background:#4f46e5;
+            padding:10px;
+            color:white;
+            border-radius:10px;
+        ">
+            {{ (total/budget*100) | round(1) if budget else 0 }}%
+        </div>
+    </div>
+
+    <!-- 💰 SET BUDGET -->
+    <div class="form-box">
+        <form method="post">
+            <input type="number" name="budget" placeholder="Set Monthly Budget">
+            <button>Update Budget</button>
+        </form>
+    </div>
+
+    <!-- ➕ ADD EXPENSE -->
+    <div class="form-box">
+        <form method="post">
+            <input name="amount" placeholder="Amount" required>
+            <input name="category" placeholder="Category" required>
+            <input type="date" name="date">
+            <button>Add Expense</button>
+        </form>
+    </div>
+
+    <!-- TABLE -->
+    <table>
+        <tr>
+            <th>Amount</th>
+            <th>Category</th>
+            <th>Date</th>
+            <th>Actions</th>
+        </tr>
+
+        {% for e in expenses %}
+        <tr>
+            <td>₹ {{ e.amount }}</td>
+            <td>{{ e.category }}</td>
+            <td>{{ e.date }}</td>
+            <td class="actions">
+                <a href="/edit/{{ e.id }}">✏️</a>
+                <a href="/delete/{{ e.id }}" onclick="return confirm('Are you sure?')">❌</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <!-- CHART -->
+    <div style="background:white; padding:20px; border-radius:12px; margin-top:20px;">
+        <canvas id="myChart"></canvas>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const data = {
+        labels: {{ categories.keys() | list | tojson }},
+        datasets: [{
+            data: {{ categories.values() | list | tojson }},
+            backgroundColor: [
+                '#4f46e5', '#22c55e', '#f59e0b', '#ef4444', '#06b6d4'
+            ]
+        }]
+    };
+
+    new Chart(document.getElementById('myChart'), {
+        type: 'doughnut',
+        data: data,
+        options: {
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

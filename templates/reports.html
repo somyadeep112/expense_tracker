@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Reports</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI';
+            display: flex;
+            background: #f5f7fa;
+        }
+
+        .sidebar {
+            width: 220px;
+            background: #1f2937;
+            color: white;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 10px;
+            color: #d1d5db;
+            text-decoration: none;
+        }
+
+        .sidebar a:hover {
+            background: #374151;
+        }
+
+        .main {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .cards {
+            display: flex;
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            flex: 1;
+        }
+
+        canvas {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .active {
+    background: #4f46e5;   /* purple highlight */
+    color: white !important;
+    font-weight: bold;
+    border-radius: 8px;
+}
+
+/* optional hover improvement */
+.sidebar a:hover {
+    background: #374151;
+    color: white;
+}
+    </style>
+</head>
+
+<body>
+
+<div class="sidebar">
+    <h2>💰 Expense</h2>
+
+    <a href="/dashboard" class="{% if active_page=='dashboard' %}active{% endif %}">📊 Dashboard</a>
+    <a href="/expenses" class="{% if active_page=='expenses' %}active{% endif %}">📋 Expenses</a>
+    <a href="/reports" class="{% if active_page=='reports' %}active{% endif %}">📑 Reports</a>
+    <a href="/logout">🚪 Logout</a>
+</div>
+
+<div class="main">
+
+    <h2>Reports</h2>
+
+    <!-- CARDS -->
+    <div class="cards">
+        <div class="card">
+            <h3>Total Expense</h3>
+            ₹ {{ total }}
+        </div>
+
+        <div class="card">
+            <h3>Categories</h3>
+            {{ categories|length }}
+        </div>
+
+        <div class="card">
+            <h3>Months</h3>
+            {{ months|length }}
+        </div>
+    </div>
+
+    <!-- CATEGORY CHART -->
+    <h3>Category Breakdown</h3>
+    <canvas id="categoryChart"></canvas>
+
+    <!-- MONTHLY CHART -->
+    <h3>Monthly Expenses</h3>
+    <canvas id="monthChart"></canvas>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // CATEGORY PIE
+    new Chart(document.getElementById('categoryChart'), {
+        type: 'pie',
+        data: {
+            labels: {{ categories.keys() | list | tojson }},
+            datasets: [{
+                data: {{ categories.values() | list | tojson }}
+            }]
+        }
+    });
+
+    // MONTH BAR
+    new Chart(document.getElementById('monthChart'), {
+        type: 'bar',
+        data: {
+            labels: {{ months.keys() | list | tojson }},
+            datasets: [{
+                label: 'Monthly Expense',
+                data: {{ months.values() | list | tojson }}
+            }]
+        }
+    });
+</script>
+
+</body>
+</html>

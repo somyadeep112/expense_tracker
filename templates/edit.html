@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Expense</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .box {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        input {
+            padding: 10px;
+            margin: 10px;
+        }
+
+        button {
+            padding: 10px;
+            background: blue;
+            color: white;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h2>Edit Expense</h2>
+
+    <form method="post">
+        <input name="amount" value="{{ expense.amount }}"><br>
+        <input name="category" value="{{ expense.category }}"><br>
+
+        <!-- ✅ NEW DATE FIELD -->
+        <input type="date" name="date" value="{{ expense.date }}"><br>
+
+        <button>Update</button>
+    </form>
+
+</div>
+
+</body>
+</html>
